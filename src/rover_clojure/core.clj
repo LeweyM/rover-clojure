@@ -1,16 +1,15 @@
 (ns rover-clojure.core
   (:require [clojure.string :as str]))
 
-(defn initial-coordinates
-  "get initial coordinates from input"
-  [input]
+(defn split-input-at [input i]
   (str/split
-    (get (str/split input #"\n") 1)
+    (get (str/split input #"\n") i)
     #" "))
 
-(defn instructions
-  "get instructions from input"
-  [input]
+(defn initial-coordinates [input]
+  (split-input-at input 1))
+
+(defn instructions [input]
   (let [move-list (str/split input #"\n")]
     (if (and (= (count move-list) 3)
              (not (empty? (get move-list 2))))
@@ -19,9 +18,7 @@
 
 (defn plateau
   [input]
-  (let [plat (map #(Integer/parseInt %) (str/split
-               (get (str/split input #"\n") 0)
-               #" "))]
+  (let [plat (map #(Integer/parseInt %) (split-input-at input 0))]
     (fn [x y]
       (not (and (and (<= x (first plat)) (>= x 0))
                 (and (<= y (second plat)) (>= y 0)))))))
@@ -41,34 +38,27 @@
       :else direction)
     ))
 
-(defn advance-y [position instruction]
-  (if (= instruction "M")
-    (cond
-      (= "N" (get position 2)) (str (+ (get-y position) 1))
-      (= "S" (get position 2)) (str (- (get-y position) 1))
-      :else (get position 1))
-    (get position 1)))
+(defn difference
+  [direction instruction]
+  (cond
+    (or (= instruction "L")
+        (= instruction "R")) [0 0 (turn direction instruction)]
+    (= direction "N") [0 1 direction]
+    (= direction "S") [0 -1 direction]
+    (= direction "E") [1 0 direction]
+    (= direction "W") [-1 0 direction]))
 
-(defn advance-x [position instruction]
-  (if (= instruction "M")
-    (cond
-      (= "E" (get position 2)) (str (+ (get-x position) 1))
-      (= "W" (get position 2)) (str (- (get-x position) 1))
-      :else (get position 0))
-    (get position 0)))
+(defn sum-positions [pos-1 pos-2]
+  [(str (+ (get-x pos-1) (first pos-2)))
+   (str (+ (get-y pos-1) (second pos-2)))
+   (get pos-2 2)])
 
-(defn step
-  [position instruction]
-  [(advance-x position instruction)
-   (advance-y position instruction)
-   (turn (get position 2) instruction)]
-  )
-
+(defn step [position instruction]
+  (sum-positions position (difference (get position 2) instruction)))
 
 (defn move [instructions position out-of-bounds?]
   (cond
-    (> (count instructions) 0)
-      (recur (pop instructions) (step position (first instructions)) out-of-bounds?)
+    (> (count instructions) 0) (recur (pop instructions) (step position (first instructions)) out-of-bounds?)
     (out-of-bounds? (get-x position) (get-y position)) "out of bounds"
     :else (str/join " " position)))
 

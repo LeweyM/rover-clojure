@@ -16,26 +16,25 @@
     (is (= (turn "W" "L") "S"))
     )
 
-  (testing "advance-y"
-    (is (= (advance-y ["0" "0" "N"] "M") "1"))
-    (is (= (advance-y ["3" "3" "S"] "M") "2"))
-    (is (= (advance-y ["0" "0" "E"] "M") "0"))
-    (is (= (advance-y ["0" "0" "E"] "L") "0"))
-    (is (= (advance-y ["0" "0" "E"] "R") "0"))
-    )
-
-  (testing "advance-x"
-    (is (= (advance-x ["2" "2" "E"] "M") "3"))
-    (is (= (advance-x ["2" "2" "W"] "M") "1"))
-    (is (= (advance-x ["2" "2" "S"] "M") "2"))
-    (is (= (advance-x ["2" "2" "N"] "M") "2"))
-    (is (= (advance-x ["2" "2" "E"] "L") "2"))
-    (is (= (advance-x ["2" "2" "E"] "R") "2"))
-    )
 
   (testing "step"
     (is (= (step ["0" "0" "N"] "M") ["0" "1" "N"]))
     (is (= (step ["0" "0" "N"] "R") ["0" "0" "E"]))
+    )
+
+  (testing "difference"
+    (is (= (difference "N" "L") [0 0 "W"]))
+    (is (= (difference "N" "R") [0 0 "E"]))
+    (is (= (difference "N" "M") [0 1 "N"]))
+    (is (= (difference "S" "M") [0 -1 "S"]))
+    (is (= (difference "E" "M") [1 0 "E"]))
+    (is (= (difference "W" "M") [-1 0 "W"]))
+    )
+
+  (testing "sum-positions"
+    (is (= (sum-positions ["0" "0" "N"] [0 1 "N"]) ["0" "1" "N"]))
+    (is (= (sum-positions ["2" "4" "S"] [1 0 "E"]) ["3" "4" "E"]))
+    (is (= (sum-positions ["2" "4" "S"] [1 -1 "S"]) ["3" "3" "S"]))
     )
 
   (testing "out-of-bounds?"
