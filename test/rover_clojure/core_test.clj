@@ -3,10 +3,10 @@
             [rover-clojure.core :refer :all]))
 
 (deftest a-test
-  (testing "instructions splitter"
-    (is (= (instructions "5 5\n1 2 N") '()))
-    (is (= (instructions "5 5\n1 2 N\nM") '("M")))
-    (is (= (instructions "5 5\n1 2 N\nMM") '("M", "M")))
+  (testing "instructions"
+    (is (= (instructions "1 2 N") '()))
+    (is (= (instructions "1 2 N\nM") '("M")))
+    (is (= (instructions "1 2 N\nMM") '("M", "M")))
     )
 
   (testing "turning"
@@ -49,10 +49,15 @@
     )
 
   (testing "Given input for one rover, return the final coordinates"
-    (is (= (rover "5 5\n1 2 N\n") "1 2 N"))
-    (is (= (rover "5 5\n0 0 N\nMMM") "0 3 N"))
-    (is (= (rover "5 5\n1 2 N\nLMLMLMLMM") "1 3 N"))
-    (is (= (rover "5 5\n3 3 E\nMMRMMRMRRM") "5 1 E"))
-    (is (= (rover "3 3\n2 2 N\nMMMMM") "out of bounds"))
+    (is (= (rover "1 2 N\n" (fn [x y] false)) "1 2 N"))
+    (is (= (rover "0 0 N\nMMM" (fn [x y] false)) "0 3 N"))
+    (is (= (rover "1 2 N\nLMLMLMLMM" (fn [x y] false)) "1 3 N"))
+    (is (= (rover "3 3 E\nMMRMMRMRRM" (fn [x y] false)) "5 1 E"))
+    (is (= (rover "2 2 N\nMMMMM" (fn [x y] true)) "out of bounds"))
+    )
+
+  (testing "multiple rovers"
+    (is (= (mission "5 5\n1 2 N\nLMLMLMLMM\n3 3 E\nMMRMMRMRRM")
+           "1 3 N\n5 1 E"))
     )
   )

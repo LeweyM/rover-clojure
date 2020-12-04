@@ -7,13 +7,13 @@
     #" "))
 
 (defn initial-coordinates [input]
-  (split-input-at input 1))
+  (split-input-at input 0))
 
 (defn instructions [input]
   (let [move-list (str/split input #"\n")]
-    (if (and (= (count move-list) 3)
-             (not (empty? (get move-list 2))))
-      (apply list (str/split (get move-list 2) #""))
+    (if (and (= (count move-list) 2)
+             (not (empty? (get move-list 1))))
+      (apply list (str/split (get move-list 1) #""))
       '())))
 
 (defn plateau
@@ -62,7 +62,17 @@
     (out-of-bounds? (get-x position) (get-y position)) "out of bounds"
     :else (str/join " " position)))
 
-(defn rover [input]
+(defn rover [input out-of-bounds?]
   (move (instructions input)
         (initial-coordinates input)
-        (plateau input)))
+        out-of-bounds?)
+  )
+
+(defn mission [input]
+  (let [out-of-bounds? (plateau input)
+        rover-instructions (partition 2 (pop (apply list (str/split-lines input))))]
+    (str/join "\n"
+              (map (fn [instructions] (rover (str/join "\n" instructions) out-of-bounds?))
+                   rover-instructions))
+    )
+  )
